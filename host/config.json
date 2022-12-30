@@ -1,0 +1,36 @@
+{
+    "name": "FallGuys_client",
+    "padding": [0, 0, 0, 35],
+    "scale": 0.2,
+	"match_width": 1280,
+    "stick": ["left", "top,height"],
+    "display_fps": 5,
+    "check_fps": 0.5,
+    "data": [
+	    {
+            "file": "start_show.png",
+            "area": [0.74, 0.80, 0.89, 0.86],
+            "thre": 0.60,
+            "comment": "Start_Show",
+            "enable": true,
+            "action": [0.74, 0.80, 0.89, 0.86]
+        },
+		{
+            "file": "start_show1.png",
+            "area": [0.74, 0.80, 0.89, 0.86],
+            "thre": 0.60,
+            "comment": "Start_Show_1",
+            "enable": true,
+            "action": [0.74, 0.80, 0.89, 0.86]
+        },
+		{
+            "file": "skip.png",
+            "area": [0.94, 0.94, 0.99, 0.98],
+            "thre": 0.60,
+            "comment": "Skip",
+            "enable": true,
+            "action": [0.94, 0.94, 0.99, 0.98]
+        }
+    ]
+}
+
