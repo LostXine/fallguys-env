@@ -22,14 +22,6 @@
             "comment": "Start_Show_1",
             "enable": true,
             "action": [0.74, 0.80, 0.89, 0.86]
-        },
-		{
-            "file": "skip.png",
-            "area": [0.94, 0.94, 0.99, 0.98],
-            "thre": 0.60,
-            "comment": "Skip",
-            "enable": true,
-            "action": [0.94, 0.94, 0.99, 0.98]
         }
     ]
 }

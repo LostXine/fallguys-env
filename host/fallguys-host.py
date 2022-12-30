@@ -86,13 +86,16 @@ class GameManager:
                         name = item['comment']
                     if item['enable']:
                     
-                        def get_patch(img, area):
+                        def get_patch(img, area, expand=0):
                             h, w = img.shape[:2]
-                            return img[int(h * area[1]): int(h * area[3]), int(w * area[0]): int(w * area[2])]
+                            return img[int(h * area[1] * (1-expand)): int(h * area[3] * (1 + expand)),
+                             int(w * area[0] * (1 - expand)): int(w * area[2] * (1 + expand))]
                         # print(tgt.shape, area)
                         tgt = get_patch(tgt, area)
                         # print(tgt.shape, src.shape)
-                        src_c = cv2.resize(get_patch(src, area), (tgt.shape[1], tgt.shape[0]))
+                        expand = 0.05
+                        
+                        src_c = cv2.resize(get_patch(src, area, expand), (int(tgt.shape[1] * (1 + expand * 2)), int(tgt.shape[0] * (1 + expand * 2))))
                         
                         # print(tgt.shape, src_c.shape)
                         # cv2.imshow(name, np.hstack([src_c, tgt]))
