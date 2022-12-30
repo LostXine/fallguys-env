@@ -82,24 +82,32 @@ class GameManager:
                     thre = item['thre']
                     action = item['action']
                     area = item['area']
+                    search_area = item['search_area']
                     if 'comment' in item:
                         name = item['comment']
                     if item['enable']:
                     
-                        def get_patch(img, area, expand=0):
+                        def get_patch(img, area):
                             h, w = img.shape[:2]
-                            return img[int(h * area[1] * (1-expand)): int(h * area[3] * (1 + expand)),
-                             int(w * area[0] * (1 - expand)): int(w * area[2] * (1 + expand))]
+                            return img[int(h * area[1]): int(h * area[3]), int(w * area[0]): int(w * area[2])]
+
+                        def unify_size(tgt, tgt_area, src_area):
+                            return (int(tgt.shape[1] * (src_area[2] - src_area[0]) / (tgt_area[2] - tgt_area[0])),
+                            int(tgt.shape[0] * (src_area[3] - src_area[1]) / (tgt_area[3] - tgt_area[1])))
+
                         # print(tgt.shape, area)
                         tgt = get_patch(tgt, area)
                         # print(tgt.shape, src.shape)
-                        expand = 0.05
-                        
-                        src_c = cv2.resize(get_patch(src, area, expand), (int(tgt.shape[1] * (1 + expand * 2)), int(tgt.shape[0] * (1 + expand * 2))))
+                        src_c = cv2.resize(get_patch(src, search_area), unify_size(tgt, area, search_area))
                         
                         # print(tgt.shape, src_c.shape)
-                        # cv2.imshow(name, np.hstack([src_c, tgt]))
-                        # cv2.waitKey(1)
+                        """
+                        tgt_p = np.zeros_like(src_c)
+                        tgt_p[:tgt.shape[0], :tgt.shape[1]] = tgt
+                        cv2.imshow(name, np.hstack([src_c, tgt_p]))
+                        cv2.waitKey(1)
+                        """
+
                         res = cv2.matchTemplate(src_c, tgt, cv2.TM_CCOEFF_NORMED)
                         val = np.max(res)
 
@@ -111,7 +119,7 @@ class GameManager:
                             # cv2.waitKey(10)
                             # print(name, "checked")
                             tmp_text += " √"
-                            self.screen_mouse_touch_area(item['action'])
+                            self.screen_mouse_touch_area(action)
                             do_action = True
                         text_list.append(tmp_text)
                 self.text = '\n'.join(text_list)
