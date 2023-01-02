@@ -11,7 +11,9 @@ import threading
 import random
 import time
 import pyautogui
-            
+from controller import VController
+from server import Server
+
 
 class GameManager:
     def __init__(self, config):
@@ -34,6 +36,14 @@ class GameManager:
 
         self.thread = threading.Thread(target=GameManager.check_loop, args=(self,))
         self.thread.start()
+
+        self.controller = VController()
+
+        self.s1 = Server("192.168.196.136", 5001)
+        self.s2 = Server("192.168.196.44", 5002)
+        self.s3 = Server("192.168.196.246", 5003)
+        self.s4 = Server("192.168.196.24", 5004)
+        self.s5 = Server("127.0.0.1", 5005)
     
     
     def load_img(self):
@@ -124,6 +134,28 @@ class GameManager:
                         text_list.append(tmp_text)
                 self.text = '\n'.join(text_list)
                 
+                # print("do action...")
+                # self.controller.jump()
+                # self.controller.dive()
+                # self.controller.rotate()
+                # self.controller.up()
+                # self.controller.down()
+                # self.controller.left()
+                # self.controller.right()
+                # self.controller.camera_center()
+                # self.controller.mock1()
+                # self.controller.mock2()
+                # self.controller.mock3()
+                # self.controller.mock4()
+                print("sending instructions...")
+                actions = [0, 1, 2, 3, 4, 5]
+                info = self.encode_msg(actions)
+                self.s1.send(info)
+                self.s2.send(info)
+                self.s3.send(info)
+                self.s4.send(info)
+                self.s5.send(info)
+
                 if not do_action:
                     self.bbox["pt"] = []
             else:
@@ -133,6 +165,13 @@ class GameManager:
             time.sleep(self.check_interval)
             
     
+    def encode_msg(self, msg):
+        msg = ["S"] + msg + ["E"]
+        info = ",".join(map(str, msg))
+        info = info.encode('utf-8')
+        return info
+
+
     def check_img(self, win_info, src):
         self.win_top = win_info['top']
         self.win_left = win_info['left']
