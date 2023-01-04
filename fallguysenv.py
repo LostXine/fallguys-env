@@ -2,6 +2,7 @@ import socket
 import numpy as np
 import cv2 
 from util import crop_image_by_pts, load_img, load_cfg
+from collections import deque
 
 
 class FallGuysEnv:
@@ -12,6 +13,7 @@ class FallGuysEnv:
         self.obs_source = self.cfg['obs_source']
         self.obs_shape = self.cfg['obs_shape']
         self.obs_stack = self.cfg['obs_stack']
+        self.obs_skip = self.cfg['obs_skip']
         self.viz = False
 
         # start camera for state
@@ -20,6 +22,7 @@ class FallGuysEnv:
         self.cam.set(3, camera_info[0]) # width
         self.cam.set(4, camera_info[1]) # height
         self.cam.set(5, camera_info[2]) # fps
+        self._frames = deque([], maxlen=self.obs_stack)
 
         # init for template matching
         self.img_dict = {}
@@ -43,10 +46,16 @@ class FallGuysEnv:
         cv2.waitKey(1)
 
     def _make_state(self, slot=[]):
-        frames = [cv2.resize(crop_image_by_pts(self.cam.read()[1], self.obs_source), self.obs_shape) for _ in range(self.obs_stack)]
-        detect = self._match_image(frames[-1], slot) # check states if necessary
-        stack = np.concatenate(frames, axis=-1) # H, W, C*stack
-        state= np.transpose(stack, (2, 0, 1))
+        for _ in range(self.obs_skip):
+            self.cam.read()
+        img = cv2.resize(crop_image_by_pts(self.cam.read()[1], self.obs_source), self.obs_shape)
+        detect = self._match_image(img, slot) # check states if necessary
+        img = np.transpose(img, (2, 0, 1))
+        while len(self._frames) < self.obs_stack:
+            self._frames.append(img)
+        self._frames.append(img)
+
+        state = np.concatenate(list(self._frames), axis=-1) # H, W, C*stack
         if self.viz:
             self.viz_state(state)
         return state, detect # C*stack, H, W
