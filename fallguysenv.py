@@ -46,7 +46,7 @@ class FallGuysEnv:
         detect = self._match_image(frames[-1], slot) # check states if necessary
         stack = np.concatenate(frames, axis=-1) # H, W, C*stack
         state= np.transpose(stack, (2, 0, 1))
-        self.viz_state(state)
+        # self.viz_state(state)
         return state, detect # C*stack, H, W
 
 
@@ -62,7 +62,7 @@ class FallGuysEnv:
             # print(tgt.shape, src.shape)
             res = cv2.matchTemplate(src_c, tgt, cv2.TM_CCOEFF_NORMED)
             detect[name] = np.max(res) > item['thre']
-        print(detect)
+        # print(detect)
         return detect
 
     def reset(self):
