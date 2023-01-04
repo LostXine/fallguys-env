@@ -116,11 +116,14 @@ class FallGuysEnv:
 
 if __name__ == '__main__':
     # Camera 0: 192.168.0.42
+    # Camera 2: 192.168.0.44
+    # Camera 4: 192.168.0.41
+    # Camera 6: 192.168.0.43
     env = FallGuysEnv(('192.168.0.42', 5005))
     env.viz = True
     env.reset()
     print("Game started")
     done = False
     while not done:
-        _, reward, done = env.step(np.random.rand(7))
+        _, reward, done = env.step(np.random.rand(7) * 2 - 1)
     print(f"Game finished, reward: {reward}")
