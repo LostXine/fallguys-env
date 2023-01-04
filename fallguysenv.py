@@ -9,7 +9,7 @@ class FallGuysEnv:
         self.target = udp_target
         self.socket = socket.socket(socket.AF_INET, # Internet
                         socket.SOCK_DGRAM) # UDP
-        self.sock.settimeout(0.5)
+        self.socket.settimeout(0.5)
 
         self.cam = cv2.VideoCapture(camera_idx)
 
