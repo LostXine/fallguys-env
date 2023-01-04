@@ -5,19 +5,22 @@ import time
 
 
 class FallGuysEnv:
-    def __init__(self, udp_target=('127.0.0.1', 5005), camera_idx=0) -> None:
+    def __init__(self, udp_target=('127.0.0.1', 5005), camera_idx=0, camera_size=(1920,1080)) -> None:
         self.target = udp_target
         self.socket = socket.socket(socket.AF_INET, # Internet
                         socket.SOCK_DGRAM) # UDP
         self.socket.settimeout(0.5)
 
         self.cam = cv2.VideoCapture(camera_idx)
+        self.cam.set(3, camera_size[0])
+        self.cam.set(4, camera_size[1])
 
 
     def reset(self):
         ret, frame = self.cam.read()
-        while True:
+        while ret:
             try:
+                ret, frame = self.cam.read()
                 cv2.imshow('Frame', frame)
                 cv2.waitKey(5)
             except KeyboardInterrupt:
