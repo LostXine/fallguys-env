@@ -35,12 +35,19 @@ class FallGuysEnv:
                         socket.SOCK_DGRAM) # UDP
         self.socket.settimeout(0.5)
 
+    @staticmethod
+    def viz_state(state, name='state'):
+        s = np.transpose(state.copy(), (1, 2, 0))
+        cv2.imshow(name, np.hstack([s[:, :, i:i+3] for i in range(0, s.shape[2], 3)]))
+        cv2.waitKey(1)
+
     def _make_state(self, slot=[]):
         frames = [cv2.resize(crop_image_by_pts(self.cam.read()[1], self.obs_source), self.obs_shape) for _ in range(self.obs_stack)]
         detect = self._match_image(frames[0], slot) # check states if necessary
         stack = np.concatenate(frames, axis=-1) # H, W, C*stack
-        
-        return np.transpose(stack, (2, 0, 1)), detect # C*stack, H, W
+        state= np.transpose(stack, (2, 0, 1))
+        self.viz_state(state)
+        return state, detect # C*stack, H, W
 
 
     def _match_image(self, src, slot):
