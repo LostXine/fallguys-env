@@ -12,6 +12,7 @@ class FallGuysEnv:
         self.obs_source = self.cfg['obs_source']
         self.obs_shape = self.cfg['obs_shape']
         self.obs_stack = self.cfg['obs_stack']
+        self.viz = False
 
         # start camera for state
         self.cam = cv2.VideoCapture(camera_idx)
@@ -46,7 +47,8 @@ class FallGuysEnv:
         detect = self._match_image(frames[-1], slot) # check states if necessary
         stack = np.concatenate(frames, axis=-1) # H, W, C*stack
         state= np.transpose(stack, (2, 0, 1))
-        # self.viz_state(state)
+        if self.viz:
+            self.viz_state(state)
         return state, detect # C*stack, H, W
 
 
@@ -106,6 +108,7 @@ class FallGuysEnv:
 if __name__ == '__main__':
     # Camera 0: 192.168.0.42
     env = FallGuysEnv(('192.168.0.42', 5005))
+    env.viz = True
     env.reset()
     print("Game started")
     done = False

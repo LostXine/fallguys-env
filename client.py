@@ -19,12 +19,12 @@ class VController:
         self.gamepad.right_joystick_float(x_value_float=action[2], y_value_float=action[3]) # rotate camera
         # jump
         if action[4] > 0:
-            self.gamepad.press(vg.XUSB_BUTTON.XUSB_GAMEPAD_A)
+            self.gamepad.press_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_A)
         else:
             self.gamepad.release_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_A)
         # dive
         if action[5] > 0:
-            self.gamepad.press(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
+            self.gamepad.press_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
         else:
             self.gamepad.release_button(vg.XUSB_BUTTON.XUSB_GAMEPAD_X)
         # grab
