@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 import json
-import win32gui
+import cv2
 
 
 def load_cfg(name='config.json'):
@@ -9,8 +9,18 @@ def load_cfg(name='config.json'):
         cfg = json.loads(content)
         return cfg
 
+def load_img(name, width, mode=0):
+    img = cv2.imread('./img/' + name, mode)
+    if img.shape[1] == width:
+        return img
+    w = width
+    h = int(w * img.shape[0] / img.shape[1])
+    img = cv2.resize(img, (w, h))
+    return img
+
 
 def get_possible_window_name(name="FallGuys_client"):
+    import win32gui
     print("Search for the window whose name contains", name)
     possible_hwnd = None
     def winEnumHandler(hwnd, ctx):
@@ -33,7 +43,13 @@ def crop_image_by_pts(img, pts):
     return img[h1:h2, w1:w2]
 
 
+def unify_size(tgt, tgt_area, src_area):
+    return (int(tgt.shape[1] * (src_area[2] - src_area[0]) / (tgt_area[2] - tgt_area[0])),
+    int(tgt.shape[0] * (src_area[3] - src_area[1]) / (tgt_area[3] - tgt_area[1])))
+
+
 def get_window_roi(name, pos, padding):
+    import win32gui
     x1, y1, x2, y2 = pos
     ptop, pdown, pleft, pright = padding
     handle = win32gui.FindWindow(0, name)
@@ -62,16 +78,6 @@ def get_window_roi(name, pos, padding):
     
     
 if __name__ == '__main__':
-    print("Resize images")
-    import glob 
-    import cv2 as cv
-    imgs = glob.glob('img/*.png')
-    
-    for i in imgs:
-        img = cv.imread(i, 0)
-        if img.shape[1] > 1024:
-            print(f"Process {i}")
-            img = cv.resize(img, (1024, 576))
-            cv.imwrite(i, img)
+    pass
     
     
