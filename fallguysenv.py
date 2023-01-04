@@ -43,7 +43,7 @@ class FallGuysEnv:
 
     def _make_state(self, slot=[]):
         frames = [cv2.resize(crop_image_by_pts(self.cam.read()[1], self.obs_source), self.obs_shape) for _ in range(self.obs_stack)]
-        detect = self._match_image(frames[0], slot) # check states if necessary
+        detect = self._match_image(frames[-1], slot) # check states if necessary
         stack = np.concatenate(frames, axis=-1) # H, W, C*stack
         state= np.transpose(stack, (2, 0, 1))
         self.viz_state(state)
@@ -58,15 +58,14 @@ class FallGuysEnv:
             name = item['slot']
             tgt = self.img_dict[name]
             tgt = crop_image_by_pts(tgt, item['area'])
-            src = crop_image_by_pts(src[:, :, 1], item['search_area'])
+            src_c = crop_image_by_pts(src[:, :, 1], item['search_area'])
             # print(tgt.shape, src.shape)
-            res = cv2.matchTemplate(src, tgt, cv2.TM_CCOEFF_NORMED)
+            res = cv2.matchTemplate(src_c, tgt, cv2.TM_CCOEFF_NORMED)
             detect[name] = np.max(res) > item['thre']
         print(detect)
         return detect
 
     def reset(self):
-        _, frame = self.cam.read()
         while True:
             try:
                 state, res = self._make_state(['on_reset'])
