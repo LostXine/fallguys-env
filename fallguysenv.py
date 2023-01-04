@@ -1,7 +1,7 @@
 import socket
 import numpy as np
 import cv2 
-from util import crop_image_by_pts, load_img, load_cfg, unify_size
+from util import crop_image_by_pts, load_img, load_cfg
 
 
 class FallGuysEnv:
