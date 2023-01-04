@@ -1,6 +1,6 @@
 import vgamepad as vg
 import numpy as np
-import win32com
+import win32com.client
 import win32api
 
 class VController:

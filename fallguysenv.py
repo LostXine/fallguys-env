@@ -88,13 +88,13 @@ class FallGuysEnv:
         reward = self.cfg['reward_time']
         # for _ in range(self.cfg['action_delay']):
         #    self.cam.read()
-        state, detect = self._make_state(['qualified', 'eliminated'])
+        state, detect = self._make_state(['qualified', 'eliminated', 'round_over'])
 
-        done = detect['qualified'] | detect['eliminated']
+        done = detect['qualified'] | detect['eliminated'] | detect['round_over']
 
         if detect['qualified']:
             reward = self.cfg['reward_win']
-        elif detect['eliminated']:
+        elif detect['eliminated'] or detect['round_over']:
             reward = self.cfg['reward_loss']
 
         return state, reward, done
