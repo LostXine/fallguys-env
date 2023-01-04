@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import json
 import win32gui
+import cv2
 
 
 def load_cfg(name='config.json'):
@@ -8,6 +9,15 @@ def load_cfg(name='config.json'):
         content = f.read()
         cfg = json.loads(content)
         return cfg
+
+def load_img(name, width, mode=0):
+    img = cv2.imread('./img/' + name, mode)
+    if img.shape[1] == width:
+        return img
+    w = width
+    h = int(w * img.shape[0] / img.shape[1])
+    img = cv2.resize(img, (w, h))
+    return img
 
 
 def get_possible_window_name(name="FallGuys_client"):
@@ -31,6 +41,11 @@ def crop_image_by_pts(img, pts):
     h1, h2 = int(pts[1] * h), int(pts[3] * h)
     w1, w2 = int(pts[0] * w), int(pts[2] * w)
     return img[h1:h2, w1:w2]
+
+
+def unify_size(tgt, tgt_area, src_area):
+    return (int(tgt.shape[1] * (src_area[2] - src_area[0]) / (tgt_area[2] - tgt_area[0])),
+    int(tgt.shape[0] * (src_area[3] - src_area[1]) / (tgt_area[3] - tgt_area[1])))
 
 
 def get_window_roi(name, pos, padding):

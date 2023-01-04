@@ -19,7 +19,7 @@ class GameManager:
         self.check_interval = 1 / config['check_fps']
         self.cfg = config
         self.img_dict = {}
-        self.load_img()
+        self.load_img_set()
         self.run = True
         self.src_img = None
         self.text = "Loading……"
@@ -36,14 +36,11 @@ class GameManager:
         self.thread.start()
     
     
-    def load_img(self):
+    def load_img_set(self):
         self.img_dict = {}
         for item in self.cfg['data']:
             name = item['file']
-            img = cv2.imread('./img/' + name, 0)
-            w = self.cfg['match_width']
-            h = int(w * img.shape[0] / img.shape[1])
-            img = cv2.resize(img, (w, h))
+            img = load_img(name, self.cfg['match_width'])
             # print(img.shape)
             self.img_dict[name] = img
 
@@ -77,6 +74,8 @@ class GameManager:
                 
                 do_action = False
                 for item in self.cfg['data']:
+                    if not item['enable']:
+                        continue
                     name = item['file']
                     tgt = self.img_dict[name]
                     thre = item['thre']
@@ -85,43 +84,34 @@ class GameManager:
                     search_area = item['search_area']
                     if 'comment' in item:
                         name = item['comment']
-                    if item['enable']:
                     
-                        def get_patch(img, area):
-                            h, w = img.shape[:2]
-                            return img[int(h * area[1]): int(h * area[3]), int(w * area[0]): int(w * area[2])]
+                    # print(tgt.shape, area)
+                    tgt = crop_image_by_pts(tgt, area)
+                    # print(tgt.shape, src.shape)
+                    src_c = cv2.resize(crop_image_by_pts(src, search_area), unify_size(tgt, area, search_area))
+                    
+                    # print(tgt.shape, src_c.shape)
+                    """
+                    tgt_p = np.zeros_like(src_c)
+                    tgt_p[:tgt.shape[0], :tgt.shape[1]] = tgt
+                    cv2.imshow(name, np.hstack([src_c, tgt_p]))
+                    cv2.waitKey(1)
+                    """
 
-                        def unify_size(tgt, tgt_area, src_area):
-                            return (int(tgt.shape[1] * (src_area[2] - src_area[0]) / (tgt_area[2] - tgt_area[0])),
-                            int(tgt.shape[0] * (src_area[3] - src_area[1]) / (tgt_area[3] - tgt_area[1])))
+                    res = cv2.matchTemplate(src_c, tgt, cv2.TM_CCOEFF_NORMED)
+                    val = np.max(res)
 
-                        # print(tgt.shape, area)
-                        tgt = get_patch(tgt, area)
-                        # print(tgt.shape, src.shape)
-                        src_c = cv2.resize(get_patch(src, search_area), unify_size(tgt, area, search_area))
-                        
-                        # print(tgt.shape, src_c.shape)
-                        """
-                        tgt_p = np.zeros_like(src_c)
-                        tgt_p[:tgt.shape[0], :tgt.shape[1]] = tgt
-                        cv2.imshow(name, np.hstack([src_c, tgt_p]))
-                        cv2.waitKey(1)
-                        """
+                    # print("Check " + name, val, thre)
+                    tmp_text = f"{name}: {val:.2f}({thre:.2f})"
 
-                        res = cv2.matchTemplate(src_c, tgt, cv2.TM_CCOEFF_NORMED)
-                        val = np.max(res)
-
-                        # print("Check " + name, val, thre)
-                        tmp_text = f"{name}: {val:.2f}({thre:.2f})"
-
-                        if val > thre and not do_action:
-                            # cv2.imshow(name, src_c)
-                            # cv2.waitKey(10)
-                            # print(name, "checked")
-                            tmp_text += " √"
-                            self.screen_mouse_touch_area(action)
-                            do_action = True
-                        text_list.append(tmp_text)
+                    if val > thre and not do_action:
+                        # cv2.imshow(name, src_c)
+                        # cv2.waitKey(10)
+                        # print(name, "checked")
+                        tmp_text += " √"
+                        self.screen_mouse_touch_area(action)
+                        do_action = True
+                    text_list.append(tmp_text)
                 self.text = '\n'.join(text_list)
                 
                 if not do_action:

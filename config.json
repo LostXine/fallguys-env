@@ -2,7 +2,7 @@
     "name": "FallGuys_client",
     "padding": [0, 0, 0, 35],
     "scale": 0.2,
-	"match_width": 1280,
+	"match_width": 640,
     "stick": ["left", "top,height"],
     "display_fps": 5,
     "check_fps": 0.5,
