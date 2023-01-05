@@ -40,9 +40,9 @@ class FallGuysEnv:
         self.socket.settimeout(0.5)
 
     @staticmethod
-    def viz_state(state, name='state'):
-        s = np.transpose(state.copy(), (1, 2, 0))
-        cv2.imshow(name, np.hstack([s[:, :, i:i+3] for i in range(0, s.shape[2], 3)]))
+    def viz_state(state, name='f{self.target[0]}: state'):
+        s = np.transpose(state.copy(), (0, 2, 3, 1))
+        cv2.imshow(name, np.hstack([i for i in s]))
         cv2.waitKey(1)
 
     def _make_state(self, slot=[]):
@@ -55,10 +55,10 @@ class FallGuysEnv:
             self._frames.append(img)
         self._frames.append(img)
 
-        state = np.concatenate(list(self._frames), axis=-1) # H, W, C*stack
+        state = np.stack(list(self._frames), axis=0) # stack, C, H, W
         if self.viz:
             self.viz_state(state)
-        return state, detect # C*stack, H, W
+        return state, detect
 
 
     def _match_image(self, src, slot):
@@ -125,5 +125,5 @@ if __name__ == '__main__':
     print("Game started")
     done = False
     while not done:
-        _, reward, done = env.step(np.random.rand(7) * 2 - 1)
+        _, reward, done = env.step(np.random.rand(env.cfg['action_space']) * 2 - 1)
     print(f"Game finished, reward: {reward}")
